@@ -1,0 +1,89 @@
+import zipfile
+import os
+
+def unzip_file(zip_file_path, extract_to_folder):
+
+    if not os.path.exists(zip_file_path):
+        print(f"The zip file {zip_file_path} does not exist.")
+        return
+    if not os.path.exists(extract_to_folder):
+        os.makedirs(extract_to_folder)
+
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_to_folder)
+        print(f"Files extracted to {extract_to_folder}")
+
+zip_file_path = "/content/Homework/xjL1dOBlTgOOdJCxEWQK_face_recognition_files (2) (1).zip"
+
+extract_to_folder = "/content"
+
+unzip_file(zip_file_path, extract_to_folder)
+
+
+!pip install deepface
+
+
+from deepface import DeepFace
+import os
+import pandas as pd
+import cv2
+import matplotlib.pyplot as plt
+
+
+def analyze_images_in_directory(root_path):
+
+    image_paths = [os.path.join(root_path, f) for f in os.listdir(root_path) if f.endswith(('.jpg', '.jpeg', '.png'))]
+
+    results = []
+
+    for path in image_paths:
+
+        result = DeepFace.analyze(path, actions=["age", "gender", "race", "emotion"])
+
+        for idx, face in enumerate(result):
+            results.append(
+              {
+                    "image_path": path,
+                    "face_index": idx,
+                    "age": face["age"],
+                    "gender": face["dominant_gender"],
+                    "race": face["dominant_race"],
+                    "emotion": face["dominant_emotion"]
+
+            })
+
+    return results
+
+
+    analyze_images_in_directory("/content/face_recognition_files/faces_assignment")
+
+
+
+    def visualize_all_attribute(img_path, result):
+
+    image = cv2.imread(img_path)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1.5
+    thickness = 2
+    color = (255, 255, 255)
+    shadow_color = (0, 0, 0)
+
+    plt.imshow(image_rgb)
+    plt.axis('off')
+    plt.title(f"Age:{result[0]['age']}, Gender: {result[0]['dominant_gender']}, Race: {result[0]['dominant_race']}, Emotion: {result[0]['dominant_emotion']}")
+    plt.show()
+
+    result = DeepFace.analyze(img_path="/content/face_recognition_files/faces_assignment/face1.png", actions=["age", "gender", "race", "emotion"])
+    visualize_all_attribute("/content/face_recognition_files/faces_assignment/face1.png", result)
+
+
+images_path = "/content/face_recognition_files/faces_assignment"
+
+image_paths = [os.path.join(images_path, f) for f in os.listdir(images_path) if f.endswith(('.jpg', '.jpeg', '.png'))]
+for path in image_paths:
+
+    result = DeepFace.analyze(path, ["age", "gender", "race", "emotion"])
+
+    visualize_all_attribute(path, result)
